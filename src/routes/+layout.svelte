@@ -1,5 +1,8 @@
 <script lang="ts">
 	import TopAppBar, { Row, Section, Title } from '@smui/top-app-bar';
+	import { userStore } from '$lib/stores/userStore.js';
+	import AuthLayout from '$lib/components/AuthLayout.svelte';
+	export let data;
 </script>
 
 
@@ -10,18 +13,20 @@
 <div class="flexy">
 	<div class="top-app-bar-container flexor">
 		<TopAppBar variant="static" dense color="primary">
-            <Row>
-                <Section>
-                    <Title>HELP</Title>
-                </Section>
-            </Row>
-        </TopAppBar>
-        <div class="flexor-content">
-            <slot />
-        </div>
+			<Row>
+				<Section>
+					<Title>HELP</Title>
+				</Section>
+			</Row>
+		</TopAppBar>
+		<div class="flexor-content">
+			<slot />
+			<p>Current URL: {data.currentUrl}</p>
+			<p>Current User: {$userStore.name}</p>
+		</div>
 	</div>
-	
 </div>
+
 
 <style>
 	.top-app-bar-container {

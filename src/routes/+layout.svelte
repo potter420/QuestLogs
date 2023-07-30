@@ -1,10 +1,27 @@
 <script lang="ts">
 	import TopAppBar, { Row, Section, Title } from '@smui/top-app-bar';
-	import { userStore } from '$lib/stores/userStore.js';
-	import AuthLayout from '$lib/components/AuthLayout.svelte';
+	import { userManager } from '$lib/stores/userStore.js';
+	import { afterUpdate, onMount } from 'svelte';
+	import { goto } from '$app/navigation';
+	import type { User } from 'oidc-client-ts';
 	export let data;
+	let userName = '';
+	onMount(() => {
+		console.log('Mounted');
+	});
+	afterUpdate(async () => {
+		let user = await userManager.getUser();
+		if (user) {
+			console.log('authenticated');
+			userName = user.profile.name || '';
+			return;
+		}
+		if (data.currentUrl != '/login' && data.currentUrl != '/callback') {
+			console.log(`go from ${data.currentUrl} to login now`);
+			goto('/login');
+		}
+	});
 </script>
-
 
 <nav>
 	<a href="/">Home</a>
@@ -22,11 +39,10 @@
 		<div class="flexor-content">
 			<slot />
 			<p>Current URL: {data.currentUrl}</p>
-			<p>Current User: {$userStore.name}</p>
+			<p>Current User: {userName}</p>
 		</div>
 	</div>
 </div>
-
 
 <style>
 	.top-app-bar-container {

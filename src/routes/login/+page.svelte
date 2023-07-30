@@ -1,14 +1,11 @@
 <script lang="ts">
     import Button, { Label } from '@smui/button';
-    import { userStore } from '$lib/stores/userStore';
-
-    function onClick() {
-        userStore.set({
-            name: "test",
-            token: "some token",
-            authenticated: true
-        });
-        window.location.assign("/")
+    import { userManager } from '$lib/stores/userStore';
+    
+    async function onClick() {
+        let user = await userManager.signinPopup();
+        console.log(user);
+        // window.location.assign("/")
     }
 </script>
 

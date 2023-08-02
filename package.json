@@ -22,6 +22,7 @@
 		"@sveltejs/adapter-auto": "^2.0.0",
 		"@sveltejs/adapter-static": "^2.0.2",
 		"@sveltejs/kit": "^1.20.4",
+		"@ts-stack/markdown": "^1.4.0",
 		"@typescript-eslint/eslint-plugin": "^5.45.0",
 		"@typescript-eslint/parser": "^5.45.0",
 		"eslint": "^8.28.0",
@@ -38,6 +39,9 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@aws-sdk/client-s3": "^3.379.1",
+		"@aws-sdk/client-sts": "^3.379.1",
+		"monaco-editor": "^0.40.0",
 		"oidc-client-ts": "^2.2.4"
 	}
 }

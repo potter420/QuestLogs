@@ -1,21 +1,75 @@
 <script lang="ts">
-	import { goto } from "$app/navigation";
+	import Button, { Label } from '@smui/button';
+	import { userManager } from '$lib/stores/userStore';
+	import { DEFAULT_REGION, assumeRoleCommand, client } from '$lib/aws/client';
+    import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+	import MarkdownEditor from '$lib/components/MarkdownEditor.svelte';
+    import { Marked } from '@ts-stack/markdown';
+    import LayoutGrid, { Cell } from '@smui/layout-grid';
 
-    let a = 0;
-    function sleep(ms: number) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-    async function demo() {
-        for (let i = 0; i < 5; i++) {
-            a = i;
-            await sleep(i * 500);
+    async function onClick() {
+        let user = await userManager.getUser();
+        if (user == null) {
+            return;
         }
-        console.log('Done');
-        // window.location.assign("https://google.com");
+        const assumedRole = await client
+        .send(assumeRoleCommand(user))
+        .then((res) => {
+            return res;
+        })
+        .catch((err) => {
+            console.log(err);
+            return null;
+        });
+        if (assumedRole == null) {
+            return;
+        }
+        const s3Client = new S3Client({
+            region: DEFAULT_REGION,
+            credentials: {
+                accessKeyId: assumedRole.Credentials?.AccessKeyId || '',
+                secretAccessKey: assumedRole.Credentials?.SecretAccessKey || '',
+                sessionToken: assumedRole.Credentials?.SessionToken || '',
+            },
+        });
+        const command = new PutObjectCommand({
+            Bucket: 'journal-content',
+            Key: `${user.profile.sub}/test.txt`,
+            Body: content,
+        });
+        await s3Client.send(command).then((res) => {
+            console.log(res);
+        }).catch((err) => {
+            console.log(err);
+        })
+        // window.location.assign("/")
     }
-
-    demo();
+    let content = '';
+    function setContent(c: string) {
+        content = c;
+    }
+ 
 </script>
 
-<p>This is a about site, counter {a}</p>
+
+<LayoutGrid class="mainEditor">
+    <Cell span={6}>
+        <MarkdownEditor setContent={setContent}/>
+    </Cell>
+    <Cell span={6}>
+        <div id="preview">
+            {@html Marked.parse(content)}
+        </div>
+    </Cell>
+</LayoutGrid>
+<Button on:click={onClick} variant="raised">
+	<Label>Submit</Label>
+</Button>
+<style>
+    #preview {
+        height: 29vh;
+        overflow: auto;
+    }
+</style>
+
+

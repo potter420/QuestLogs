@@ -1,5 +1,6 @@
 <script lang="ts">
 	import TopAppBar, { Row, Section, Title } from '@smui/top-app-bar';
+	import Button, { Label } from '@smui/button';
 	import { userManager } from '$lib/stores/userStore.js';
 	import { afterUpdate, onMount } from 'svelte';
 	import { goto } from '$app/navigation';
@@ -11,8 +12,9 @@
 	});
 	afterUpdate(async () => {
 		let user = await userManager.getUser();
-		if (user) {
+		if (user != null && (user.expired || false) != true) {
 			console.log('authenticated');
+			
 			userName = user.profile.name || '';
 			return;
 		}
@@ -23,16 +25,17 @@
 	});
 </script>
 
-<nav>
-	<a href="/">Home</a>
-	<a href="/about">About</a>
-</nav>
 <div class="flexy">
 	<div class="top-app-bar-container flexor">
 		<TopAppBar variant="static" dense color="primary">
 			<Row>
 				<Section>
-					<Title>HELP</Title>
+					<Title>Journal</Title>
+				</Section>
+				<Section >
+					<Button href="/"><Title >Home</Title></Button>
+					<Button href="/about"><Title >About</Title></Button>
+					<Button href="/journals"><Title >Journal</Title></Button>
 				</Section>
 			</Row>
 		</TopAppBar>
@@ -48,7 +51,7 @@
 	.top-app-bar-container {
 		max-width: 100%;
 		width: 100%;
-		height: 320px;
+		height: 90%;
 		border: 1px solid var(--mdc-theme-text-hint-on-background, rgba(0, 0, 0, 0.1));
 		margin: 0 18px 18px 0;
 		background-color: var(--mdc-theme-background, #fff);
@@ -66,6 +69,7 @@
 	.flexy {
 		display: flex;
 		flex-wrap: wrap;
+		height: 100%;
 	}
 
 	.flexor {
